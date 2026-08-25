@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta, timezone
+from uuid import uuid4
 
-from jose import JWTError, jwt
+from jose import jwt
 from passlib.context import CryptContext
 
 from app.core.config import settings
@@ -30,7 +31,8 @@ def create_access_token(
     subject: str,
     role: str,
 ) -> str:
-    expire = datetime.now(timezone.utc) + timedelta(
+    now = datetime.now(timezone.utc)
+    expire = now + timedelta(
         minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES
     )
 
@@ -38,6 +40,8 @@ def create_access_token(
         "sub": subject,
         "role": role,
         "type": "access",
+        "jti": str(uuid4()),
+        "iat": now,
         "exp": expire,
     }
 
@@ -52,7 +56,8 @@ def create_refresh_token(
     subject: str,
     role: str,
 ) -> str:
-    expire = datetime.now(timezone.utc) + timedelta(
+    now = datetime.now(timezone.utc)
+    expire = now + timedelta(
         days=settings.REFRESH_TOKEN_EXPIRE_DAYS
     )
 
@@ -60,6 +65,8 @@ def create_refresh_token(
         "sub": subject,
         "role": role,
         "type": "refresh",
+        "jti": str(uuid4()),
+        "iat": now,
         "exp": expire,
     }
 
